@@ -1,5 +1,5 @@
 /**
- * Component for task1
+ * Screen for task1
  *
  * @package src/screens/task1
  * @author  <devphoenix092@gmail.com>
@@ -24,7 +24,7 @@ import { ModalTypeEnum } from "../../models/enums/modal";
 import { displayTime, previewBody } from "../../utils/utils";
 import { TableFields } from "../../models/table";
 
-const Task1Component = () => {
+const Task1Screen = () => {
   const [allNoteData, setAllNoteData] = useState<NoteProps[]>([]); // data of all notes
   const [noteData, setNoteData] = useState<NoteProps[]>([]); // data of filtered notes
   const [keyword, setKeyword] = useState<string>(""); // keyword to search
@@ -364,4 +364,4 @@ const Task1Component = () => {
   );
 };
 
-export default Task1Component;
+export default Task1Screen;
