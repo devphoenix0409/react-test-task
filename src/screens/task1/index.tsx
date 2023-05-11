@@ -10,9 +10,11 @@ import {
   Textarea,
   Button,
 } from "@chakra-ui/react";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { NoteProps } from "../../models/note";
 import { ModalTypeEnum } from "../../models/enums/modal";
 import { displayTime, previewBody } from "../../utils/utils";
+import { TableFields } from "../../models/table";
 
 const Task1Component = () => {
   const [noteData, setNoteData] = useState<NoteProps[]>([]);
@@ -22,6 +24,12 @@ const Task1Component = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isDisabled, setIsDisabled] = useState<boolean>(true);
   const [modalType, setModalType] = useState<string>(ModalTypeEnum.ADD_NOTE);
+  const initSortStatus: any[] = [];
+  TableFields.forEach((field) => {
+    initSortStatus.push(true);
+  });
+
+  const [sortStatus, setSortStatus] = useState<Array<boolean>>(initSortStatus);
 
   const handleAddNote = () => {
     setId(0);
@@ -42,8 +50,9 @@ const Task1Component = () => {
         updated_at: Date.now(),
       };
 
-      setNoteData(noteData.concat(note));
+      setNoteData(JSON.parse(JSON.stringify(noteData.concat(note))));
 
+      handleInit();
       setIsOpen(false);
     }
   };
@@ -64,13 +73,13 @@ const Task1Component = () => {
   const editNote = (id: number) => {
     if (!isDisabled) {
       const pos = noteData.map((item: NoteProps) => item.id).indexOf(id);
-      let updateNoteData = noteData;
+      let updatedNoteData = noteData;
 
-      updateNoteData[pos].title = title;
-      updateNoteData[pos].body = body;
-      updateNoteData[pos].updated_at = Date.now();
+      updatedNoteData[pos].title = title;
+      updatedNoteData[pos].body = body;
+      updatedNoteData[pos].updated_at = Date.now();
 
-      setNoteData(updateNoteData);
+      setNoteData(JSON.parse(JSON.stringify(updatedNoteData)));
 
       setIsOpen(false);
     }
@@ -92,7 +101,7 @@ const Task1Component = () => {
       setNoteData([]);
     } else {
       const updatedNoteData = noteData.splice(pos - 1, 1);
-      setNoteData(updatedNoteData);
+      setNoteData(JSON.parse(JSON.stringify(updatedNoteData)));
     }
 
     handleInit();
@@ -108,6 +117,27 @@ const Task1Component = () => {
   const handleClose = () => {
     handleInit();
     setIsOpen(false);
+  };
+
+  const handleSort = (field: string) => {
+    if (noteData.length !== 0) {
+      const index = TableFields.indexOf(field);
+      let sortItems: any[] = [];
+      sortStatus[index] = !sortStatus[index];
+      setSortStatus(JSON.parse(JSON.stringify(sortStatus)));
+
+      if (!sortStatus[index]) {
+        sortItems = noteData.sort((one: any, two: any) =>
+          one[field] < two[field] ? 1 : -1
+        );
+      } else {
+        sortItems = noteData.sort((one: any, two: any) =>
+          one[field] < two[field] ? -1 : 1
+        );
+      }
+
+      setNoteData(JSON.parse(JSON.stringify(sortItems)));
+    }
   };
 
   useEffect(() => {
@@ -130,11 +160,47 @@ const Task1Component = () => {
       <div className="content overflow-x">
         <div className="body">
           <div className="flex header p-5">
-            <div className="row id">No</div>
-            <div className="row normal">Title</div>
-            <div className="row normal">Body</div>
-            <div className="row normal">Created Date</div>
-            <div className="row normal">Updated Date</div>
+            <div className="row id" onClick={() => handleSort("id")}>
+              No
+            </div>
+            <div className="row normal" onClick={() => handleSort("title")}>
+              Title
+              {sortStatus[1] ? (
+                <ChevronUpIcon className="icon" />
+              ) : (
+                <ChevronDownIcon className="icon" />
+              )}
+            </div>
+            <div className="row normal" onClick={() => handleSort("body")}>
+              Body
+              {sortStatus[2] ? (
+                <ChevronUpIcon className="icon" />
+              ) : (
+                <ChevronDownIcon className="icon" />
+              )}
+            </div>
+            <div
+              className="row normal"
+              onClick={() => handleSort("created_at")}
+            >
+              Created Date
+              {sortStatus[3] ? (
+                <ChevronUpIcon className="icon" />
+              ) : (
+                <ChevronDownIcon className="icon" />
+              )}
+            </div>
+            <div
+              className="row normal"
+              onClick={() => handleSort("updated_at")}
+            >
+              Updated Date
+              {sortStatus[4] ? (
+                <ChevronUpIcon className="icon" />
+              ) : (
+                <ChevronDownIcon className="icon" />
+              )}
+            </div>
             <div className="row action">Actions</div>
           </div>
 

@@ -5,6 +5,11 @@
 
 .header {
   font-size: large;
+  cursor: pointer;
+}
+
+.icon {
+  margin-left: 5px;
 }
 
 .title {
