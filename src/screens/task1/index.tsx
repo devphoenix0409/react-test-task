@@ -25,7 +25,9 @@ import { displayTime, previewBody } from "../../utils/utils";
 import { TableFields } from "../../models/table";
 
 const Task1Component = () => {
-  const [noteData, setNoteData] = useState<NoteProps[]>([]); // data of all notes
+  const [allNoteData, setAllNoteData] = useState<NoteProps[]>([]); // data of all notes
+  const [noteData, setNoteData] = useState<NoteProps[]>([]); // data of filtered notes
+  const [keyword, setKeyword] = useState<string>(""); // keyword to search
   const initNote: NoteProps = {
     id: 0,
     title: "",
@@ -63,12 +65,12 @@ const Task1Component = () => {
       // Checking validate to add a new note
       const note: NoteProps = {
         ...currentNote,
-        id: noteData.length + 1,
+        id: allNoteData.length + 1,
         created_at: Date.now(),
         updated_at: Date.now(),
       };
 
-      setNoteData(JSON.parse(JSON.stringify(noteData.concat(note)))); // Update note data
+      setAllNoteData(JSON.parse(JSON.stringify(allNoteData.concat(note)))); // Update note data
 
       handleInit();
       setIsOpen(false); // Close modal
@@ -80,8 +82,8 @@ const Task1Component = () => {
    * @param {number} id
    */
   const handleEditNote = (id: number) => {
-    const pos = noteData.map((item: NoteProps) => item.id).indexOf(id);
-    setCurrentNote(noteData[pos]);
+    const pos = allNoteData.map((item: NoteProps) => item.id).indexOf(id);
+    setCurrentNote(allNoteData[pos]);
     setModalType(ModalTypeEnum.EDIT_NOTE);
     setIsOpen(true); // Open modal
   };
@@ -92,14 +94,14 @@ const Task1Component = () => {
    */
   const editNote = (id: number) => {
     if (!isValidate) {
-      const pos = noteData.map((item: NoteProps) => item.id).indexOf(id);
-      let updatedNoteData = noteData;
+      const pos = allNoteData.map((item: NoteProps) => item.id).indexOf(id);
+      let updatedNoteData = allNoteData;
 
       updatedNoteData[pos].title = currentNote.title;
       updatedNoteData[pos].body = currentNote.body;
       updatedNoteData[pos].updated_at = Date.now();
 
-      setNoteData(JSON.parse(JSON.stringify(updatedNoteData))); // Update note data
+      setAllNoteData(JSON.parse(JSON.stringify(updatedNoteData))); // Update note data
 
       setIsOpen(false); // Close modal
     }
@@ -110,8 +112,8 @@ const Task1Component = () => {
    * @param {number} id
    */
   const handleDeleteNote = (id: number) => {
-    const pos = noteData.map((item: NoteProps) => item.id).indexOf(id);
-    setCurrentNote(noteData[pos]);
+    const pos = allNoteData.map((item: NoteProps) => item.id).indexOf(id);
+    setCurrentNote(allNoteData[pos]);
     setModalType(ModalTypeEnum.DELETE_NOTE);
     setIsOpen(true); // Open modal
   };
@@ -121,10 +123,10 @@ const Task1Component = () => {
    * @param {number} id
    */
   const deleteNote = (id: number) => {
-    const updatedNoteData = noteData.filter(
+    const updatedNoteData = allNoteData.filter(
       (note: NoteProps) => note.id !== id
     );
-    setNoteData(JSON.parse(JSON.stringify(updatedNoteData))); // Update note data
+    setAllNoteData(JSON.parse(JSON.stringify(updatedNoteData))); // Update note data
 
     handleInit();
     setIsOpen(false); // Close modal
@@ -150,30 +152,30 @@ const Task1Component = () => {
    */
   const handleClean = () => {
     handleInit();
-    setNoteData([]);
+    setAllNoteData([]);
   };
 
   /**
    * The function to sort
    */
   const handleSort = (field: string) => {
-    if (noteData.length !== 0) {
+    if (allNoteData.length !== 0) {
       const index = TableFields.indexOf(field);
       let sortItems: any[] = [];
       sortStatus[index] = !sortStatus[index];
       setSortStatus(JSON.parse(JSON.stringify(sortStatus))); // Update note data
 
       if (!sortStatus[index]) {
-        sortItems = noteData.sort((one: any, two: any) =>
+        sortItems = allNoteData.sort((one: any, two: any) =>
           one[field] < two[field] ? 1 : -1
         );
       } else {
-        sortItems = noteData.sort((one: any, two: any) =>
+        sortItems = allNoteData.sort((one: any, two: any) =>
           one[field] < two[field] ? -1 : 1
         );
       }
 
-      setNoteData(JSON.parse(JSON.stringify(sortItems))); // Update note data
+      setAllNoteData(JSON.parse(JSON.stringify(sortItems))); // Update note data
     }
   };
 
@@ -205,16 +207,33 @@ const Task1Component = () => {
     }
   }, [currentNote]);
 
+  useEffect(() => {
+    const filterNoteData: NoteProps[] = allNoteData.filter(
+      (note: NoteProps) =>
+        note.title.includes(keyword) || note.body.includes(keyword)
+    );
+    setNoteData(JSON.parse(JSON.stringify(filterNoteData))); // Update note data
+  }, [allNoteData, keyword]);
+
   return (
     <div className="content">
       <div className="title">Task 1</div>
-      <div className="action-content">
-        <Button colorScheme="blue" onClick={handleAddNote}>
-          Add New Note
-        </Button>
-        <Button className="ml-10" colorScheme="red" onClick={handleClean}>
-          Clean
-        </Button>
+      <div className="flex justify-between">
+        <div className="w-1-4">
+          <Input
+            placeholder="Search"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+          />
+        </div>
+        <div className="action-content">
+          <Button colorScheme="blue" onClick={handleAddNote}>
+            Add New Note
+          </Button>
+          <Button className="ml-10" colorScheme="red" onClick={handleClean}>
+            Clean
+          </Button>
+        </div>
       </div>
 
       <div className="content overflow-x">
