@@ -1,3 +1,11 @@
+/**
+ * Component for task1
+ *
+ * @package src/screens/task1
+ * @author  <devphoenix092@gmail.com>
+ * @version 1.0
+ */
+
 import { useState, useEffect } from "react";
 import {
   Modal,
@@ -17,53 +25,65 @@ import { displayTime, previewBody } from "../../utils/utils";
 import { TableFields } from "../../models/table";
 
 const Task1Component = () => {
-  const [noteData, setNoteData] = useState<NoteProps[]>([]);
-  const [id, setId] = useState<number>(0);
-  const [title, setTitle] = useState<string>("");
-  const [body, setBody] = useState<string>("");
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [isDisabled, setIsDisabled] = useState<boolean>(true);
-  const [modalType, setModalType] = useState<string>(ModalTypeEnum.ADD_NOTE);
-  const initSortStatus: any[] = [];
+  const [noteData, setNoteData] = useState<NoteProps[]>([]); // data of all notes
+  const initNote: NoteProps = {
+    id: 0,
+    title: "",
+    body: "",
+    created_at: 0,
+    updated_at: 0,
+  };
+  const [currentNote, setCurrentNote] = useState<NoteProps>(initNote); // current selected note
+  const [isOpen, setIsOpen] = useState<boolean>(false); // status of modal
+  const [isValidate, setIsValidate] = useState<boolean>(true); // validate to add new note
+  const [modalType, setModalType] = useState<string>(ModalTypeEnum.ADD_NOTE); // modal type such as add, edit, delete
+  const initSortStatus: any[] = []; // init sort status of fields
+
+  // Push false to all field's sort status
   TableFields.forEach((field) => {
     initSortStatus.push(true);
   });
 
-  const [sortStatus, setSortStatus] = useState<Array<boolean>>(initSortStatus);
+  const [sortStatus, setSortStatus] = useState<Array<boolean>>(initSortStatus); // sort status of fields
 
+  /**
+   * The function to handle to add a new note
+   */
   const handleAddNote = () => {
-    setId(0);
+    setCurrentNote(initNote);
     setModalType(ModalTypeEnum.ADD_NOTE);
-    setIsOpen(true);
+    setIsOpen(true); // Open modal
   };
 
   /**
    * The function to add new note
    */
   const addNote = () => {
-    if (!isDisabled) {
+    if (!isValidate) {
+      // Checking validate to add a new note
       const note: NoteProps = {
+        ...currentNote,
         id: noteData.length + 1,
-        title,
-        body,
         created_at: Date.now(),
         updated_at: Date.now(),
       };
 
-      setNoteData(JSON.parse(JSON.stringify(noteData.concat(note))));
+      setNoteData(JSON.parse(JSON.stringify(noteData.concat(note)))); // Update note data
 
       handleInit();
-      setIsOpen(false);
+      setIsOpen(false); // Close modal
     }
   };
 
+  /**
+   * The function to handle to edit note
+   * @param {number} id
+   */
   const handleEditNote = (id: number) => {
     const pos = noteData.map((item: NoteProps) => item.id).indexOf(id);
-    setId(id);
-    setTitle(noteData[pos].title);
-    setBody(noteData[pos].body);
+    setCurrentNote(noteData[pos]);
     setModalType(ModalTypeEnum.EDIT_NOTE);
-    setIsOpen(true);
+    setIsOpen(true); // Open modal
   };
 
   /**
@@ -71,24 +91,29 @@ const Task1Component = () => {
    * @param {number} id
    */
   const editNote = (id: number) => {
-    if (!isDisabled) {
+    if (!isValidate) {
       const pos = noteData.map((item: NoteProps) => item.id).indexOf(id);
       let updatedNoteData = noteData;
 
-      updatedNoteData[pos].title = title;
-      updatedNoteData[pos].body = body;
+      updatedNoteData[pos].title = currentNote.title;
+      updatedNoteData[pos].body = currentNote.body;
       updatedNoteData[pos].updated_at = Date.now();
 
-      setNoteData(JSON.parse(JSON.stringify(updatedNoteData)));
+      setNoteData(JSON.parse(JSON.stringify(updatedNoteData))); // Update note data
 
-      setIsOpen(false);
+      setIsOpen(false); // Close modal
     }
   };
 
+  /**
+   * The function to handle to delete note
+   * @param {number} id
+   */
   const handleDeleteNote = (id: number) => {
-    setId(id);
+    const pos = noteData.map((item: NoteProps) => item.id).indexOf(id);
+    setCurrentNote(noteData[pos]);
     setModalType(ModalTypeEnum.DELETE_NOTE);
-    setIsOpen(true);
+    setIsOpen(true); // Open modal
   };
 
   /**
@@ -96,35 +121,47 @@ const Task1Component = () => {
    * @param {number} id
    */
   const deleteNote = (id: number) => {
-    const pos = noteData.map((item: NoteProps) => item.id).indexOf(id);
-    if (noteData.length === 1) {
-      setNoteData([]);
-    } else {
-      const updatedNoteData = noteData.splice(pos - 1, 1);
-      setNoteData(JSON.parse(JSON.stringify(updatedNoteData)));
-    }
+    const updatedNoteData = noteData.filter(
+      (note: NoteProps) => note.id !== id
+    );
+    setNoteData(JSON.parse(JSON.stringify(updatedNoteData))); // Update note data
 
     handleInit();
-    setIsOpen(false);
+    setIsOpen(false); // Close modal
   };
 
+  /**
+   * The function to init of current note
+   */
   const handleInit = () => {
-    setId(0);
-    setTitle("");
-    setBody("");
+    setCurrentNote(initNote);
   };
 
+  /**
+   * The function to close modal
+   */
   const handleClose = () => {
     handleInit();
     setIsOpen(false);
   };
 
+  /**
+   * The function to delete all notes
+   */
+  const handleClean = () => {
+    handleInit();
+    setNoteData([]);
+  };
+
+  /**
+   * The function to sort
+   */
   const handleSort = (field: string) => {
     if (noteData.length !== 0) {
       const index = TableFields.indexOf(field);
       let sortItems: any[] = [];
       sortStatus[index] = !sortStatus[index];
-      setSortStatus(JSON.parse(JSON.stringify(sortStatus)));
+      setSortStatus(JSON.parse(JSON.stringify(sortStatus))); // Update note data
 
       if (!sortStatus[index]) {
         sortItems = noteData.sort((one: any, two: any) =>
@@ -136,17 +173,37 @@ const Task1Component = () => {
         );
       }
 
-      setNoteData(JSON.parse(JSON.stringify(sortItems)));
+      setNoteData(JSON.parse(JSON.stringify(sortItems))); // Update note data
     }
   };
 
+  /**
+   * The function to edit title
+   */
+  const changeTitle = (title: string) => {
+    setCurrentNote({
+      ...currentNote,
+      title: title,
+    });
+  };
+
+  /**
+   * The function to edit body
+   */
+  const changeBody = (body: string) => {
+    setCurrentNote({
+      ...currentNote,
+      body: body,
+    });
+  };
+
   useEffect(() => {
-    if (title !== "" && body !== "") {
-      setIsDisabled(false);
+    if (currentNote.title !== "" && currentNote.body !== "") {
+      setIsValidate(false);
     } else {
-      setIsDisabled(true);
+      setIsValidate(true);
     }
-  }, [title, body]);
+  }, [currentNote]);
 
   return (
     <div className="content">
@@ -154,6 +211,9 @@ const Task1Component = () => {
       <div className="action-content">
         <Button colorScheme="blue" onClick={handleAddNote}>
           Add New Note
+        </Button>
+        <Button className="ml-10" colorScheme="red" onClick={handleClean}>
+          Clean
         </Button>
       </div>
 
@@ -241,15 +301,15 @@ const Task1Component = () => {
                 <div className="p-5">
                   <Input
                     placeholder="Enter Title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    value={currentNote.title}
+                    onChange={(e) => changeTitle(e.target.value)}
                   />
                 </div>
                 <div className="p-5">
                   <Textarea
                     placeholder="Enter Body"
-                    value={body}
-                    onChange={(e) => setBody(e.target.value)}
+                    value={currentNote.body}
+                    onChange={(e) => changeBody(e.target.value)}
                   />
                 </div>
               </>
@@ -271,8 +331,8 @@ const Task1Component = () => {
                   modalType === ModalTypeEnum.ADD_NOTE
                     ? addNote()
                     : modalType === ModalTypeEnum.EDIT_NOTE
-                    ? editNote(id)
-                    : deleteNote(id)
+                    ? editNote(currentNote.id)
+                    : deleteNote(currentNote.id)
                 }
               >
                 Confirm
