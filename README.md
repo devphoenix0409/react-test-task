@@ -20,6 +20,14 @@
 
 ### Please submit your code via GitHub or a similar code-sharing platform, along with instructions for running the application.
 
+### Result:
+```
+git clone https://github.com/devphoenix0409/react-test-task.git
+cd react-test-task
+yarn
+yarn start
+```
+
 ## Task 2: Find and fix issues with the following code:
 
 ```
@@ -58,4 +66,11 @@ for (var i = 0; i < 10; i++) {
         console.log(multiplyByClosure(i))
     };
 }
+```
+
+### Result:
+```
+git clone https://github.com/devphoenix0409/react-test-task.git
+cd react-test-task/src/screens/task2
+open index.html
 ```
