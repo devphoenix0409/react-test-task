@@ -1,0 +1,52 @@
+.content {
+  width: 100vw;
+  padding: 20px;
+}
+
+.header {
+  font-size: large;
+}
+
+.title {
+  font-size: xx-large;
+  text-align: center;
+  padding: 10px;
+}
+
+.body {
+  min-width: 800px;
+}
+
+.action-content {
+  text-align: end;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.normal {
+  width: 17.5%;
+}
+
+.id {
+  width: 5%;
+}
+
+.action {
+  width: 25%;
+}
+
+.overflow-x {
+  overflow-x: auto;
+}
+
+.flex {
+  display: flex;
+}
+
+.p-5 {
+  padding: 5px;
+}
