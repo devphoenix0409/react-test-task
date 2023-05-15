@@ -21,6 +21,7 @@
 ### Please submit your code via GitHub or a similar code-sharing platform, along with instructions for running the application.
 
 ### Result:
+
 ```
 git clone https://github.com/devphoenix0409/react-test-task.git
 cd react-test-task
@@ -69,6 +70,7 @@ for (var i = 0; i < 10; i++) {
 ```
 
 ### Result:
+
 ```
 git clone https://github.com/devphoenix0409/react-test-task.git
 cd react-test-task/src/screens/task2
