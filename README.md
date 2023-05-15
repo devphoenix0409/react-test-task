@@ -21,6 +21,7 @@
 ### Please submit your code via GitHub or a similar code-sharing platform, along with instructions for running the application.
 
 ### Result:
+
 ```
 git clone https://github.com/devphoenix0409/react-test-task.git
 cd react-test-task
@@ -28,49 +29,51 @@ yarn
 yarn start
 ```
 
-## Task 2: Find and fix issues with the following code:
+## Task 3: Improve the following component’s code. Reduce number of requests & StudentsTable total update time. fetchStudentData, fetchSchoolData & fetchLegalguardianData can only fetch one entity per request, we don’t have control over remote API. Please, abstain from using help of neural networks - we’re evaluating your programming skill.
 
 ```
-function multiplyByClosure(mult) {
-  const values = [0, 0.5, 1, 2, 3, 4, 5, 'a', false];
-  return values.map(function(value) {
-	if(typeof value === 'number') {
-		return value * mult
-	}
-	return value;
-  });
-}
+import StudentsPicker from '../components/StudentsPicker';
+import StudentsTable from '../components/StudentsTable';
+import { fetchStudentData, fetchSchoolData, fetchLegalguardianData } from '../utils';
+import { useState } from 'react';
 
-function countZeroValues(values) {
-	return values.filter(function(value) {
-		return value == 0
-	}).length
-}
+const studentsDataComponent = () => {
+  const [studentsData, setStudentsData] = useState([]);
+  const [schoolsData, setSchoolsData] = useState([]);
+  const [legalguardiansData, setLegalguardiansData] = useState([]);
 
-const multiplyByTwo = multiplyByClosure(2);
-console.log(multiplyByTwo);
+  const onStudentsPick = async (studentIds) => {
+    for (const studentId of studentIds) {
+      const studentData = await fetchStudentData(studentId);
+      setStudentsData([...studentsData, studentData]);
+      for (const student of studentData) {
+          const { schoolId, legalguardianId } = student;
+          const schoolData = await fetchSchoolData(schoolId);
+          setSchoolsData([...schoolsData, schoolData]);
+          const legalguardianData = await fetchLegalguardianData(legalguardianId);
+          setLegalguardiansData([...legalguardiansData, legalguardianData]);
+      }
+    }
+  };
 
-const multiplyByThree = multiplyByClosure(3);
-console.log(multiplyByThree);
+  return (
+    <>
+      <StudentsPicker onPickHandler={onStudentsPick} />
+      <StudentsTable
+        studentsData={studentsData}
+        schoolsData={schoolsData}
+        LegalguardiansData={legalguardiansData}
+      />
+    </>
+  );
+};
 
-// count zero values, expecting 1:
-console.log(countZeroValues(multiplyByTwo));
-
-for (var i = 0; i < 10; i++) {
-
-	const button = document.createElement('button');
-	button.textContent = `Multiply by ${i}`;
-	document.body.appendChild(button);
-
-    button.onclick = function() {
-        console.log(multiplyByClosure(i))
-    };
-}
+export default studentsDataComponent;
 ```
 
 ### Result:
+
 ```
 git clone https://github.com/devphoenix0409/react-test-task.git
-cd react-test-task/src/screens/task2
-open index.html
+cd react-test-task/src/screens/task3
 ```
